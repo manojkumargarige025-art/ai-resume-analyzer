@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AI Resume Analyzer</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:24px;background:#0b1020;color:#e9ecf1}
+    .card{max-width:900px;margin:auto;background:#121a33;border:1px solid #22305b;border-radius:14px;padding:18px}
+    h1{margin:0 0 6px}
+    p{color:#b9c2d6}
+    textarea,input{width:100%;padding:10px;border-radius:10px;border:1px solid #2a3b70;background:#0f1730;color:#e9ecf1}
+    textarea{min-height:140px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .btn{background:#4c7dff;border:0;padding:10px 14px;border-radius:10px;color:white;font-weight:600;cursor:pointer}
+    .btn:hover{opacity:.92}
+    .out{white-space:pre-wrap;background:#0f1730;border:1px solid #2a3b70;border-radius:10px;padding:12px}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#1d2a55;border:1px solid #2a3b70;margin:6px 8px 0 0}
+    .muted{color:#b9c2d6;font-size:14px}
+    @media(max-width:800px){.row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>AI Resume Analyzer</h1>
+    <p>Upload a resume PDF and paste a job description. Get a match score + missing skills.</p>
+
+    <form action="/analyze" method="post" enctype="multipart/form-data">
+      <div class="row">
+        <div>
+          <label class="muted">Resume (PDF)</label>
+          <input type="file" name="resume" accept="application/pdf" required />
+        </div>
+        <div>
+          <label class="muted">Candidate Name (optional)</label>
+          <input type="text" name="name" placeholder="Manoj Kumar" />
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label class="muted">Job Description</label>
+        <textarea name="job_description" placeholder="Paste the job description here..." required></textarea>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+        <button class="btn" type="submit">Analyze</button>
+        <span class="muted">No login. No storage. Just analysis.</span>
+      </div>
+    </form>
+
+    {% if result %}
+      <hr style="border:0;border-top:1px solid #22305b;margin:18px 0">
+      <h2 style="margin:0 0 8px">Result</h2>
+      <div class="out">{{ result.summary }}</div>
+
+      <div style="margin-top:12px">
+        <div class="muted">Extracted Skills</div>
+        {% for s in result.resume_skills %}
+          <span class="badge">{{ s }}</span>
+        {% endfor %}
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="muted">Missing Skills</div>
+        {% if result.missing_skills|length == 0 %}
+          <span class="badge">None (good match)</span>
+        {% else %}
+          {% for s in result.missing_skills %}
+            <span class="badge">{{ s }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
